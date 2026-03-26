@@ -7,12 +7,19 @@ jobs:
   slack_notification:
     runs-on: ubuntu-latest
     steps:
+      - name: Sanitize Body for Slack
+        id: sanitize
+        # This little script removes newlines and quotes that break JSON
+        run: |
+          BODY=$(echo "${{ github.event.issue.body }}" | jq -aRs .)
+          echo "CLEAN_BODY=$BODY" >> $GITHUB_OUTPUT
+
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
             {
-              "text": "💡 New KB Alert: ${{ github.event.issue.title }}",
+              "text": "🚀 New KB Alert: ${{ github.event.issue.title }}",
               "blocks": [
                 {
                   "type": "section",
@@ -25,7 +32,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Description:*\n${{ github.event.issue.body }}"
+                    "text": "*Description:*\n${{ steps.sanitize.outputs.CLEAN_BODY }}"
                   }
                 },
                 {
