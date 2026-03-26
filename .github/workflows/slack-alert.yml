@@ -12,32 +12,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "💡 New KB submitted: ${{ github.event.issue.title }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "💡 *New KB submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Description:*\n${{ github.event.issue.body }}"
-                  }
-                },
-                {
-                  "type": "context",
-                  "elements": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "🔗 <${{ github.event.issue.html_url }}|View on GitHub>"
-                    }
-                  ]
-                }
-              ]
+              "text": "💡 *New KB idea submitted!*\n📝 *Title:* ${{ github.event.issue.title }}\n👤*Author:* ${{ github.event.issue.user.login }}\n🔗*Link:* ${{ github.event.issue.html_url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
