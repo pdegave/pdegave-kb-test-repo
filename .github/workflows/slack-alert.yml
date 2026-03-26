@@ -10,8 +10,6 @@ jobs:
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          # We use the 'payload-file-path' style internally by using 'payload'
-          # But we wrap the body in a way that GitHub handles the escaping for us.
           payload: |
             {
               "text": "🚀 New KB Alert: ${{ github.event.issue.title }}",
@@ -40,7 +38,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Description:*\n${{ github.event.issue.body }}"
+                    "text": "*Description:*\n${{ env.ISSUE_BODY }}"
                   }
                 },
                 {
@@ -59,3 +57,5 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          # This maps the body to an environment variable safely
+          ISSUE_BODY: ${{ github.event.issue.body }}
