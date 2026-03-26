@@ -8,11 +8,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Slack Message
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
             {
-              "text": "💡 *New KB idea submitted!*\n📝 *Title:* ${{ github.event.issue.title }}\n👤*Author:* ${{ github.event.issue.user.login }}\n🔗*Link:* ${{ github.event.issue.html_url }}"
+              "text": "💡 New KB Alert: ${{ github.event.issue.title }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "💡 *New KB submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Description:*\n${{ github.event.issue.body }}"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "🔗 <${{ github.event.issue.html_url }}|View on GitHub>"
+                    }
+                  ]
+                }
+              ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
