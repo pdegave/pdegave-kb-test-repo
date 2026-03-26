@@ -1,58 +1,18 @@
-name: Slack Issue Alert
-
+name: Slack Alert
 on:
   issues:
     types: [opened]
 
 jobs:
-  slack-notification:
+  slack_notification:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Slack Notification
-        uses: slackapi/slack-github-action@v1.26.0
+      - name: Send Slack Message
+        uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
-              "text": "New KB Idea: ${{ github.event.issue.title }}",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "🚀 New KB Idea Submitted!"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Subject:*\n${{ github.event.issue.title }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Submitted By:*\n${{ github.event.issue.user.login }}"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Description:*\n${{ github.event.issue.body }}"
-                  }
-                },
-                {
-                  "type": "divider"
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "🔗 <${{ github.event.issue.html_url }}|View Issue on GitHub>"
-                  }
-                }
-              ]
+              "text": "💡 *New KB idea submitted!*\n📝 *Title:* ${{ github.event.issue.title }}\n👤*Author:* ${{ github.event.issue.user.login }}\n🔗*Link:* ${{ github.event.issue.html_url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
