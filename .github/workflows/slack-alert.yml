@@ -1,0 +1,43 @@
+name: Slack Issue Alert
+
+# This tells GitHub to run the script whenever an issue is opened
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  slack-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          # This builds the message appearance
+          payload: |
+            {
+              "text": "🚀 *New KB Idea Submitted!*",
+              "attachments": [
+                {
+                  "color": "#36a64f",
+                  "fields": [
+                    {
+                      "title": "Subject",
+                      "value": "${{ github.event.issue.title }}",
+                      "short": false
+                    },
+                    {
+                      "title": "Raised by",
+                      "value": "${{ github.event.issue.user.login }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Link",
+                      "value": "${{ github.event.issue.html_url }}",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
