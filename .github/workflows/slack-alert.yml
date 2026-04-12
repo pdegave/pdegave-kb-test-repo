@@ -43,7 +43,7 @@ jobs:
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          channel-id: 'pdegave-kb-test-new'
+          channel-id: 'pdegave-kb-test-channel'
           payload: |
             {
               "text": "🚀 New KB Idea: ${{ github.event.issue.title }}",
