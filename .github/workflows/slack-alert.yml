@@ -10,7 +10,6 @@ jobs:
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          # This ID is the channel name or ID (e.g., #team-ecmsupport-kb-alert)
           channel-id: 'pdegave-kb-test-channel' 
           payload: |
             {
@@ -20,22 +19,21 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "💡 *New KB idea submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`"
-                  }
+                    "text": "💡 *New KB idea submitted!*\n📝 *Title:* ${{ github.event.issue.title }}\n👤*Author:* ${{ github.event.issue.user.login }}\n🔗*Link:* ${{ github.event.issue.html_url }}"                  }
                 },
                 {
                   "type": "actions",
                   "elements": [
                     {
                       "type": "button",
-                      "text": { "type": "plain_text", "text": "👤 Assign Me" },
-                      "url": "${{ github.event.issue.html_url }}/assignees"
+                      "text": { "type": "plain_text", "text": "👤 View & Assign" },
+                      "url": "${{ github.event.issue.html_url }}"
                     },
                     {
                       "type": "button",
                       "text": { "type": "plain_text", "text": "✅ Close Issue" },
                       "style": "danger",
-                      "url": "${{ github.event.issue.html_url }}"
+                      "url": "${{ github.event.issue.html_url }}#issue-comment-box"
                     }
                   ]
                 }
