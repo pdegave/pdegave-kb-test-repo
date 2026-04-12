@@ -7,10 +7,8 @@ jobs:
   slack_notification:
     runs-on: ubuntu-latest
     steps:
-      # Logic: If the Slack form description contains 'Assign-Me: Yes'
-      # It assigns the person who triggered the event (the issue creator)
       - name: Auto-assign requester
-        if: contains(github.event.issue.body, 'Assign-Me: Yes')
+        if: ${{ contains(github.event.issue.body, 'Assign-Me: Yes') }}
         uses: actions/github-script@v7
         with:
           script: |
