@@ -67,7 +67,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "💡 *New KB idea submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`\n🔗 *Link:* ${{ github.event.issue.html_url }}"
+                    "text": "💡 *New KB submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`\n*Link:* ${{ github.event.issue.html_url }}"
                   }
                 },
                 {
@@ -80,8 +80,7 @@ jobs:
                     },
                     {
                       "type": "button",
-                      "text": { "type": "plain_text", "text": "✅ Close Issue" },
-                      "style": "danger",
+                      "text": { "type": "plain_text", "text": "Close Issue" },
                       "url": "${{ github.event.issue.html_url }}#issue-comment-box"
                     }
                   ]
