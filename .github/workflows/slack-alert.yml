@@ -10,9 +10,10 @@ jobs:
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
+          # This payload is structured to FORCE Slack to use Blocks
           payload: |
             {
-              "text": "🚀 New KB Idea: ${{ github.event.issue.title }}",
+              "text": "New KB Idea: ${{ github.event.issue.title }}",
               "blocks": [
                 {
                   "type": "section",
@@ -28,17 +29,21 @@ jobs:
                       "type": "button",
                       "text": {
                         "type": "plain_text",
-                        "text": "👤 Assign Me"
+                        "text": "👤 Assign Me",
+                        "emoji": true
                       },
+                      "value": "assign_issue",
                       "url": "${{ github.event.issue.html_url }}/assignees"
                     },
                     {
                       "type": "button",
                       "text": {
                         "type": "plain_text",
-                        "text": "✅ Close Issue"
+                        "text": "✅ Close Issue",
+                        "emoji": true
                       },
                       "style": "danger",
+                      "value": "close_issue",
                       "url": "${{ github.event.issue.html_url }}"
                     }
                   ]
