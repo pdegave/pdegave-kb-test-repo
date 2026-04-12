@@ -15,4 +15,4 @@ jobs:
               "text": "💡 *New KB idea submitted!*\n📝 *Title:* ${{ github.event.issue.title }}\n👤*Author:* ${{ github.event.issue.user.login }}\n🔗*Link:* ${{ github.event.issue.html_url }}"
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_1 }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
