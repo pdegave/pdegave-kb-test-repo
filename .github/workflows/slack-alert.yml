@@ -4,20 +4,27 @@ on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
   slack_notification:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Assign issue if user selected "Yes" in Slack form
       - name: Assign issue if requested
         uses: actions/github-script@v7
         with:
           script: |
-            const issueBody = context.payload.issue.body;
+            const issueBody = context.payload.issue.body || "";
 
             console.log("Issue Body:", issueBody);
 
-            if (issueBody && issueBody.includes("assign_self: Yes")) {
+            // Convert to lowercase to avoid case mismatch (Yes/yes/YES)
+            const body = issueBody.toLowerCase();
+
+            if (body.includes("assign_self: yes")) {
               const username = context.payload.issue.user.login;
 
               await github.rest.issues.addAssignees({
@@ -32,10 +39,11 @@ jobs:
               console.log("No assignment needed");
             }
 
+      # Step 2: Send Slack notification
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          channel-id: 'pdegave-kb-test-channel'
+          channel-id: 'pdegave-kb-test-new'
           payload: |
             {
               "text": "🚀 New KB Idea: ${{ github.event.issue.title }}",
