@@ -7,10 +7,24 @@ jobs:
   slack_notification:
     runs-on: ubuntu-latest
     steps:
+      # Logic: If the Slack form said "Yes", assign the issue to you
+      - name: Auto-assign if requested
+        if: contains(github.event.issue.body, 'Assign-Me: Yes')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: ['pdegave']
+            })
+
+      # Send the PagerDuty-style alert
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          channel-id: 'pdegave-kb-test-channel' 
+          channel-id: 'team-ecmsupport-kb-alert' 
           payload: |
             {
               "text": "🚀 New KB Idea: ${{ github.event.issue.title }}",
@@ -19,7 +33,8 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "💡 *New KB idea submitted!*\n📝 *Title:* ${{ github.event.issue.title }}\n👤*Author:* ${{ github.event.issue.user.login }}\n🔗*Link:* ${{ github.event.issue.html_url }}"                  }
+                    "text": "💡 *New KB idea submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`"
+                  }
                 },
                 {
                   "type": "actions",
