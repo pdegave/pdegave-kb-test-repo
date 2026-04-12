@@ -10,16 +10,15 @@ jobs:
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          # We use "blocks" to create the layout with buttons
+          # We are sending a flat JSON string here to avoid formatting issues
           payload: |
             {
-              "text": "💡 New KB Idea: ${{ github.event.issue.title }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "💡 *New KB idea submitted!*\n\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`"
+                    "text": "💡 *New KB idea submitted!*\n*Title:* ${{ github.event.issue.title }}\n*Author:* `${{ github.event.issue.user.login }}`"
                   }
                 },
                 {
@@ -40,14 +39,6 @@ jobs:
                         "text": "✅ Close Issue"
                       },
                       "style": "danger",
-                      "url": "${{ github.event.issue.html_url }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "📂 View on GitHub"
-                      },
                       "url": "${{ github.event.issue.html_url }}"
                     }
                   ]
