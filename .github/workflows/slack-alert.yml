@@ -10,10 +10,11 @@ jobs:
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         with:
-          # This payload is structured to FORCE Slack to use Blocks
+          # This ID is the channel name or ID (e.g., #team-ecmsupport-kb-alert)
+          channel-id: 'team-ecmsupport-kb-alert' 
           payload: |
             {
-              "text": "New KB Idea: ${{ github.event.issue.title }}",
+              "text": "🚀 New KB Idea: ${{ github.event.issue.title }}",
               "blocks": [
                 {
                   "type": "section",
@@ -27,23 +28,13 @@ jobs:
                   "elements": [
                     {
                       "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "👤 Assign Me",
-                        "emoji": true
-                      },
-                      "value": "assign_issue",
+                      "text": { "type": "plain_text", "text": "👤 Assign Me" },
                       "url": "${{ github.event.issue.html_url }}/assignees"
                     },
                     {
                       "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "✅ Close Issue",
-                        "emoji": true
-                      },
+                      "text": { "type": "plain_text", "text": "✅ Close Issue" },
                       "style": "danger",
-                      "value": "close_issue",
                       "url": "${{ github.event.issue.html_url }}"
                     }
                   ]
@@ -51,4 +42,4 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
