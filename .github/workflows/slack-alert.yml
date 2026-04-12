@@ -11,7 +11,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.26.0
         with:
           # This ID is the channel name or ID (e.g., #team-ecmsupport-kb-alert)
-          channel-id: 'team-ecmsupport-kb-alert' 
+          channel-id: 'pdegave-kb-test-channel' 
           payload: |
             {
               "text": "🚀 New KB Idea: ${{ github.event.issue.title }}",
