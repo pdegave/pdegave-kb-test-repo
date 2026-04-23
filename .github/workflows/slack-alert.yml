@@ -13,16 +13,15 @@ jobs:
 
     steps:
       # Step 1: Assign issue if requested
-      - name: Assign and Label issue if requested
+      - name: Assign, Label, and Deep Clean
         uses: actions/github-script@v7
         with:
           script: |
             let issueBody = context.payload.issue.body || "";
-            const bodyLower = issueBody.toLowerCase();
             const issueNumber = context.payload.issue.number;
 
-            // 1. Handle Assignment
-            if (bodyLower.includes("assign_self: yes")) {
+            // 1. Handle Assignment (Case Insensitive)
+            if (issueBody.toLowerCase().includes("assign_self: yes")) {
               const username = context.payload.issue.user.login;
               await github.rest.issues.addAssignees({
                 owner: context.repo.owner,
@@ -30,33 +29,28 @@ jobs:
                 issue_number: issueNumber,
                 assignees: [username],
               });
-              console.log(`Assigned to ${username}`);
             }
 
-            // 2. Handle Labeling
-            // This looks for "Label: name-of-label" in the text
-            const labelMatch = issueBody.match(/Label:\s*(.+)/i);
-            if (labelMatch && labelMatch[1]) {
-              const labelName = labelMatch[1].trim();
-              if (labelName.toLowerCase() !== "select an option") {
+            // 2. Handle Labeling (Handles empty labels too)
+            const labelLine = issueBody.split('\n').find(l => l.trim().toLowerCase().startsWith('label:'));
+            if (labelLine) {
+              const labelName = labelLine.split(':')[1].trim();
+              if (labelName && labelName.toLowerCase() !== "select an option") {
                 await github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issueNumber,
                   labels: [labelName],
                 });
-                console.log(`Added label: ${labelName}`);
               }
             }
 
-            // 3. 🧹 CLEANUP: Remove both hidden tags from the body
+            // 3. 🧹 THE DEEP CLEAN
+            // This regex finds the lines starting with 'assign_self' or 'label' (any case) 
+            // and removes them entirely, including the empty space they leave behind.
             const cleanedBody = issueBody
-              .split("\n")
-              .filter(line => 
-                !line.toLowerCase().includes("assign_self:") && 
-                !line.toLowerCase().includes("label:")
-              )
-              .join("\n")
+              .replace(/assign_self:\s*.*/gi, "")
+              .replace(/label:\s*.*/gi, "")
               .trim();
 
             await github.rest.issues.update({
