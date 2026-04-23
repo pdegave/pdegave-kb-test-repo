@@ -13,47 +13,59 @@ jobs:
 
     steps:
       # Step 1: Assign issue if requested
-      - name: Assign issue if requested
+      - name: Assign and Label issue if requested
         uses: actions/github-script@v7
         with:
           script: |
             let issueBody = context.payload.issue.body || "";
-
-            console.log("Original Issue Body:", issueBody);
-
             const bodyLower = issueBody.toLowerCase();
+            const issueNumber = context.payload.issue.number;
 
-            // Check if assignment is needed
+            // 1. Handle Assignment
             if (bodyLower.includes("assign_self: yes")) {
               const username = context.payload.issue.user.login;
-
               await github.rest.issues.addAssignees({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.payload.issue.number,
+                issue_number: issueNumber,
                 assignees: [username],
               });
-
-              console.log(`Assigned issue to ${username}`);
+              console.log(`Assigned to ${username}`);
             }
 
-            // 🧹 CLEANUP: remove assign_self line from body
+            // 2. Handle Labeling
+            // This looks for "Label: name-of-label" in the text
+            const labelMatch = issueBody.match(/Label:\s*(.+)/i);
+            if (labelMatch && labelMatch[1]) {
+              const labelName = labelMatch[1].trim();
+              if (labelName.toLowerCase() !== "select an option") {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  labels: [labelName],
+                });
+                console.log(`Added label: ${labelName}`);
+              }
+            }
+
+            // 3. 🧹 CLEANUP: Remove both hidden tags from the body
             const cleanedBody = issueBody
               .split("\n")
-              .filter(line => !line.toLowerCase().includes("assign_self:"))
+              .filter(line => 
+                !line.toLowerCase().includes("assign_self:") && 
+                !line.toLowerCase().includes("label:")
+              )
               .join("\n")
               .trim();
 
-            // Update issue body without assign_self
             await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.payload.issue.number,
+              issue_number: issueNumber,
               body: cleanedBody,
             });
-
-            console.log("Cleaned up issue body");
-
+            
       # Step 2: Send Slack notification
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
