@@ -61,19 +61,23 @@ jobs:
             });
             
       # Step 2: Send Slack notification
+      # Step 2: Send Slack notification
       - name: Send Slack Message
         uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         with:
           channel-id: 'pdegave-july-channel'
           payload: |
             {
-              "text": ${{ toJSON(format('🚀 New KB Idea: {0}', github.event.issue.title)) }},
+              "text": "🚀 New KB Idea: ${{ env.ISSUE_TITLE }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": ${{ toJSON(format('💡 *New KB submitted!*\n\n*Title:* {0}\n*Author:* `{1}`\n*Link:* {2}', github.event.issue.title, github.event.issue.user.login, github.event.issue.html_url)) }}
+                    "text": "💡 *New KB submitted!*\n\n*Title:* ${{ env.ISSUE_TITLE }}\n*Author:* `${{ github.event.issue.user.login }}`\n*Link:* ${{ github.event.issue.html_url }}"
                   }
                 },
                 {
@@ -93,5 +97,3 @@ jobs:
                 }
               ]
             }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
