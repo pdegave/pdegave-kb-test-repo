@@ -61,39 +61,51 @@ jobs:
             });
             
       # Step 2: Send Slack notification
-      # Step 2: Send Slack notification
-      - name: Send Slack Message
-        uses: slackapi/slack-github-action@v1.26.0
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
+      # Step 2: Prepare formatted payload safely
+      - name: Prepare Slack Payload
+        id: prepare-slack-payload
+        uses: actions/github-script@v7
         with:
-          channel-id: 'pdegave-july-channel'
-          payload: |
-            {
-              "text": "🚀 New KB Idea: ${{ env.ISSUE_TITLE }}",
-              "blocks": [
+          script: |
+            const issueTitle = context.payload.issue.title;
+            const author = context.payload.issue.user.login;
+            const issueUrl = context.payload.issue.html_url;
+
+            const payload = {
+              text: `🚀 New KB Idea: ${issueTitle}`,
+              blocks: [
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "💡 *New KB submitted!*\n\n*Title:* ${{ env.ISSUE_TITLE }}\n*Author:* `${{ github.event.issue.user.login }}`\n*Link:* ${{ github.event.issue.html_url }}"
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `💡 *New KB submitted!*\n\n*Title:* ${issueTitle}\n*Author:* \`${author}\`\n*Link:* ${issueUrl}`
                   }
                 },
                 {
-                  "type": "actions",
-                  "elements": [
+                  type: "actions",
+                  elements: [
                     {
-                      "type": "button",
-                      "text": { "type": "plain_text", "text": "👤 View & Assign" },
-                      "url": "${{ github.event.issue.html_url }}"
+                      type: "button",
+                      text: { type: "plain_text", text: "👤 View & Assign" },
+                      url: issueUrl
                     },
                     {
-                      "type": "button",
-                      "text": { "type": "plain_text", "text": "Close Issue" },
-                      "url": "${{ github.event.issue.html_url }}#issue-comment-box"
+                      type: "button",
+                      text: { type: "plain_text", text: "Close Issue" },
+                      url: `${issueUrl}#issue-comment-box`
                     }
                   ]
                 }
               ]
-            }
+            };
+
+            core.setOutput('payload', JSON.stringify(payload));
+
+      # Step 3: Send Slack notification
+      - name: Send Slack Message
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'pdegave-july-channel'
+          payload: ${{ steps.prepare-slack-payload.outputs.payload }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
